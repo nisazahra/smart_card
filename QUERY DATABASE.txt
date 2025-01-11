@@ -1,0 +1,70 @@
+--create tabel_siswa--
+CREATE TABLE tabel_siswa (
+    id_siswa INT AUTO_INCREMENT PRIMARY KEY, -- ID unik siswa
+    uid_kartu VARCHAR(50) NOT NULL UNIQUE,   -- UID kartu yang digunakan siswa
+    nama VARCHAR(100) NOT NULL,              -- Nama siswa
+    saldo DECIMAL(10, 2) DEFAULT 0.00        -- Saldo yang dimiliki siswa
+);
+
+
+--create tabel_penjual--
+CREATE TABLE tabel_penjual (
+    no_kantin INT AUTO_INCREMENT PRIMARY KEY, -- ID unik untuk penjual
+    username VARCHAR(50) NOT NULL,            -- Username penjual
+    pass VARCHAR(255) NOT NULL,               -- Password penjual
+);
+
+
+--create tabel_transaksi--
+CREATE TABLE tabel_transaksi (
+    id_transaksi INT AUTO_INCREMENT PRIMARY KEY, -- ID unik transaksi
+    no_kantin INT NOT NULL,                      -- ID kantin (penjual)
+    uid_kartu VARCHAR(50) NOT NULL,              -- UID kartu siswa
+    waktu_transaksi DATETIME DEFAULT CURRENT_TIMESTAMP, -- Waktu transaksi
+    total_transaksi DECIMAL(10, 2) NOT NULL,     -- Total nilai transaksi
+    FOREIGN KEY (no_kantin) REFERENCES tabel_penjual(no_kantin) ON DELETE CASCADE,
+    FOREIGN KEY (uid_kartu) REFERENCES tabel_siswa(uid_kartu) ON DELETE CASCADE
+);
+
+
+--create tabel_penarikan--
+CREATE TABLE tabel_penarikan (
+    id_penarikan INT AUTO_INCREMENT PRIMARY KEY, -- ID unik penarikan
+    no_kantin INT NOT NULL,                      -- ID kantin (penjual)
+    jumlah_penarikan DECIMAL(10, 2) NOT NULL,    -- Jumlah dana yang ditarik
+    waktu_penarikan DATETIME DEFAULT CURRENT_TIMESTAMP, -- Waktu penarikan
+    FOREIGN KEY (no_kantin) REFERENCES tabel_penjual(no_kantin) ON DELETE CASCADE
+);
+
+
+--create tabel_topup--
+CREATE TABLE tabel_topup (
+    id_topup INT AUTO_INCREMENT PRIMARY KEY,     -- ID unik top-up
+    uid_kartu VARCHAR(50) NOT NULL,              -- UID kartu siswa
+    jumlah_topup DECIMAL(10, 2) NOT NULL,        -- Jumlah saldo yang ditambahkan
+    waktu_topup DATETIME DEFAULT CURRENT_TIMESTAMP, -- Waktu top-up
+    admin VARCHAR(50) NOT NULL,                  -- Nama/ID admin yang melakukan top-up
+    FOREIGN KEY (uid_kartu) REFERENCES tabel_siswa(uid_kartu) ON DELETE CASCADE
+);
+
+
+--create tabel_menu--
+CREATE TABLE tabel_menu (
+    id_menu INT AUTO_INCREMENT PRIMARY KEY,      -- ID unik menu
+    no_kantin INT NOT NULL,                      -- ID kantin (penjual)
+    nama_menu VARCHAR(100) NOT NULL,             -- Nama menu
+    harga DECIMAL(10, 2) NOT NULL,               -- Harga menu
+    FOREIGN KEY (no_kantin) REFERENCES tabel_penjual(no_kantin) ON DELETE CASCADE
+);
+
+--create tabel detail_transaksi--
+CREATE TABLE detail_transaksi (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_transaksi INT NOT NULL,
+    id_menu INT NOT NULL,
+    quantity INT NOT NULL,
+    FOREIGN KEY (id_transaksi) REFERENCES tabel_transaksi(id_transaksi) ON DELETE CASCADE,
+    FOREIGN KEY (id_menu) REFERENCES tabel_menu(id_menu) ON DELETE CASCADE
+);
+
+
